@@ -104,5 +104,5 @@ jobs:
 
       - name: Snyk Code test
 
-        run: snyk code test -d --org=58a5dadc-c8d5-4ed3-b74d-985923ed7602 --sarif > snyk-code.sarif # || true
+        run: snyk code test --org=${{ secrets.SNYK_ORG }} --sarif > snyk-code.sarif # || true
         
