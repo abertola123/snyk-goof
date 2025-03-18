@@ -88,7 +88,13 @@ jobs:
 
         #    node-version: 20
 
- 
+         # Runs Snyk Code (SAST) analysis and uploads result into GitHub.
+
+        # Use || true to not fail the pipeline
+
+      - name: Snyk Code test
+
+        run: snyk code test -d --org=58a5dadc-c8d5-4ed3-b74d-985923ed7602 --sarif > snyk-code.sarif # || true
 
         env:
 
@@ -98,11 +104,5 @@ jobs:
 
  
 
-        # Runs Snyk Code (SAST) analysis and uploads result into GitHub.
 
-        # Use || true to not fail the pipeline
-
-      - name: Snyk Code test
-
-        run: snyk code test --org=${{ secrets.SNYK_ORG }} --sarif > snyk-code.sarif # || true
         
