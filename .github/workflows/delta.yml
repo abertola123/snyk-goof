@@ -46,7 +46,7 @@ jobs:
         run: |
           # Use `snyk test --json --print-deps` to get detailed JSON output
           # Pipe the output to `snyk-delta`
-          snyk test --json --print-deps | snyk-delta \
+          snyk test --json | snyk-delta \
             --baselineOrg $SNYK_ORG_ID \
             --baselineProject $SNYK_PROJECT_ID \
             --currentOrg $SNYK_ORG_ID \
