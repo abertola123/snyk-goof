@@ -1,0 +1,73 @@
+name: Example workflow for Node using Snyk
+on:
+  push:
+    branches:
+      - main # Or your default branch, for monitoring
+  pull_request:
+    branches:
+      - main # Or your default branch, for delta checks
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      # Install Node.js - Required for Snyk CLI and snyk-delta
+      - name: Setup Node.js
+        uses: actions/setup-node@v4 # Use a recent stable version
+        with:
+          node-version: '18' # Or a version compatible with your project and Snyk CLI
+
+      # Install Snyk CLI and snyk-delta globally
+      - name: Install Snyk CLI and snyk-delta
+        run: |
+          npm install -g snyk
+          npm install -g snyk-delta
+
+      # Authenticate Snyk CLI
+      - name: Authenticate Snyk
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: snyk auth $SNYK_TOKEN
+
+      # --- Step 1: Run Snyk Test and pipe to snyk-delta for PR checks ---
+      # This step will run on both push and pull_request events.
+      # It will fail the build if new vulnerabilities are introduced.
+      - name: Run Snyk test and snyk-delta
+        # This will run on PRs and also on pushes, but mainly useful for PRs
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          # Get these from your Snyk project settings URL in the Snyk UI
+          # Example: https://app.snyk.io/org/<YOUR_ORG_ID>/project/<YOUR_PROJECT_ID>
+          SNYK_ORG_ID: ${{ secrets.SNYK_ORG_ID }}     # Store this as a GitHub Secret
+          SNYK_PROJECT_ID: ${{ secrets.SNYK_PROJECT_ID }} # Store this as a GitHub Secret
+        run: |
+          # Use `snyk test --json --print-deps` to get detailed JSON output
+          # Pipe the output to `snyk-delta`
+          snyk test --json --print-deps | snyk-delta \
+            --baselineOrg $SNYK_ORG_ID \
+            --baselineProject $SNYK_PROJECT_ID \
+            --currentOrg $SNYK_ORG_ID \
+            --currentProject $SNYK_PROJECT_ID \
+            --fail-on all # Or 'upgradable', 'patchable', etc.
+
+      # --- Step 2: Run Snyk Monitor to update the baseline for future delta comparisons ---
+      # This step should ONLY run on your main/default branch (e.g., after a merge to main).
+      # It ensures that snyk-delta always has the latest security posture of your stable branch to compare against.
+      - name: Run Snyk Monitor (Update Baseline)
+        if: github.ref == 'refs/heads/main' # Only run on your main branch
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_ORG_ID: ${{ secrets.SNYK_ORG_ID }}
+        run: |
+          # The `monitor` command sends a snapshot of your project to Snyk
+          snyk monitor \
+            --org=$SNYK_ORG_ID \
+            --project-name="${{ github.repository }}" # Automatically names the project in Snyk
+            # Add --all-projects if you have a monorepo or multiple manifest files
+          
+          
+          
+          
+      
