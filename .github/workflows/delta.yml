@@ -6,6 +6,7 @@ on:
   pull_request:
     branches:
       - main # Or your default branch, for delta checks
+  workflow_dispatch:
 
 jobs:
   security:
