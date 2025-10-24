@@ -50,10 +50,10 @@ def ping_server():
     # 2. [VULNERABLE SINK] Pass unsanitized input to os.system()
     # A hacker can submit: 127.0.0.1; whoami
     # The application will execute 'ping -c 1 127.0.0.1' followed by 'whoami'
-    command = f"ping -c 1 {hostname}"
+    command = ["ping", "-c", "1", hostname]
     
     # Snyk Code should flag the os.system() call as a critical vulnerability source.
-    os.system(command) # <-- The "Sink" where the vulnerability is exploited
+    subprocess.run(command) 
     
     return f"Attempted to ping host: {hostname}"
 
