@@ -67,6 +67,7 @@ jobs:
             --org=$SNYK_ORG_ID \
             --project-name="${{ github.repository }}" # Automatically names the project in Snyk
             # Add --all-projects if you have a monorepo or multiple manifest files
+
           
           
           
