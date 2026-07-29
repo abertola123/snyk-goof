@@ -111,19 +111,6 @@ jobs:
             --project-name=demo-container-os-only
         continue-on-error: true
 
-      # ── SCAN D: Multi-platform (ARM64) ────────────────────────────────────
-      # --platform: explicitly target a specific architecture
-      # Critical if you ship multi-arch images (AMD64 ≠ ARM64 vuln profile)
-      - name: "Scan D — ARM64 platform targeting"
-        run: |
-          snyk container test ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
-            --platform=linux/arm64 \
-            --file=Dockerfile \
-            --severity-threshold=high \
-            --org=${{ secrets.SNYK_ORG_ID }} \
-            --project-name=demo-container-arm64
-        continue-on-error: true
-
   # ─────────────────────────────────────────
   # JOB 3: MONITOR (continuous tracking)
   # Pushes a snapshot to Snyk for ongoing daily monitoring
