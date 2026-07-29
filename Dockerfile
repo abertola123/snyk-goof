@@ -5,7 +5,7 @@ RUN mkdir /tmp/extracted_files
 COPY . /usr/src/goof
 WORKDIR /usr/src/goof
 
-RUN npm update
+RUN npm update --ignore-scripts
 RUN npm install
 EXPOSE 3001
 EXPOSE 9229
